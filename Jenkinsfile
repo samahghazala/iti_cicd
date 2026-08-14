@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = 'gamalm2041'
+        DOCKERHUB_USER = 'sghazala'
         APP_IMAGE = 'vprofileapp'
         DB_IMAGE = 'vprofiledb'
         TAG = 'latest'
@@ -20,7 +20,8 @@ pipeline {
             steps {
                 script {
                     dir('Docker-files/app') {
-                        sh "docker build -t ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG} ."
+                        #sh "docker build -t ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG} ."
+                        sh "docker build --build-arg BUILD_NUMBER=${env.BUILD_NUMBER} -t ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG} ."
                     }
                 }
             }
@@ -62,6 +63,9 @@ pipeline {
                     kubectl apply -f vproapp-service.yml
                     kubectl apply -f vproappdep.yml
                     kubectl apply -f vprodbdep.yml
+                    # Force rollout restart to guarantee new pods run the updated image
+                    kubectl rollout restart deployment/vproappdep || true
+                    kubectl rollout restart deployment/vprodbdep || true
                 '''
             }
         }
