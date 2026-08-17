@@ -20,21 +20,25 @@ pipeline {
             steps {
                 script {
                     dir('Docker-files/app') {
+                        withEnv(['DOCKER_HOST=tcp://localhost:2375']) {
                         sh "docker build --build-arg BUILD_NUMBER=${env.BUILD_NUMBER} -t ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG} ."
                     }
                 }
             }
         }
+      }      
 
         stage('Build DB Image') {
             steps {
                 script {
                     dir('Docker-files/db') {
+                        withEnv(["DOCKER_HOST=tcp://localhost:2375"]) {
                         sh "docker build -t ${DOCKERHUB_USER}/${DB_IMAGE}:${TAG} ."
                     }
                 }
             }
         }
+     }
 
         stage('Push to Docker Hub') {
             steps {
