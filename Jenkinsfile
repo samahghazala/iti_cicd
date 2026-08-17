@@ -20,7 +20,6 @@ pipeline {
             steps {
                 script {
                     dir('Docker-files/app') {
-                        #sh "docker build -t ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG} ."
                         sh "docker build --build-arg BUILD_NUMBER=${env.BUILD_NUMBER} -t ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG} ."
                     }
                 }
