@@ -43,18 +43,21 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh """
-                        echo $PASS | docker login -u $USER --password-stdin
+                   withEnv(["DOCKER_HOST=tcp://localhost:2375"]) {
+                    sh '''
+                        echo "$PASS" | docker login -u "$USER" --password-stdin
                         docker push ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG}
                         docker push ${DOCKERHUB_USER}/${DB_IMAGE}:${TAG}
                         docker logout
-                    """
+                    '''
                 }
             }
         }
+  }
 
         stage('Deploy to Kubernetes') {
             steps {
+                withKubeConfig(serverUrl: 'https://cluster.local') {
                 sh '''
                     # Apply only Kubernetes YAML files
                     kubectl apply -f app-secret.yml
@@ -72,6 +75,7 @@ pipeline {
                 '''
             }
         }
+     }
     }
 
     post {
