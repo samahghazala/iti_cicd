@@ -30,27 +30,20 @@ spec:
 '''
         }
     }
-    environment {
+  environment {
         DOCKERHUB_USER = 'sghazala'
-        APP_IMAGE = 'vprofileapp'
-        DB_IMAGE = 'vprofiledb'
-        TAG = 'latest'
+        APP_IMAGE      = 'vprofileapp'
+        DB_IMAGE       = 'vprofiledb'
+        TAG            = "${env.BUILD_NUMBER}"
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/samahghazala/iti_cicd.git'
-            }
-        }
-
         stage('Build App Image') {
             steps {
                 container('docker') {
                     script {
                         dir('Docker-files/app') {
-                            sh "docker build --build-arg BUILD_NUMBER=${env.BUILD_NUMBER} -t ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG} ."
+                            sh "docker build --build-arg BUILD_NUMBER=${env.BUILD_NUMBER} -t ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG} -t ${DOCKERHUB_USER}/${APP_IMAGE}:latest ."
                         }
                     }
                 }
@@ -62,26 +55,28 @@ spec:
                 container('docker') {
                     script {
                         dir('Docker-files/db') {
-                            sh "docker build -t ${DOCKERHUB_USER}/${DB_IMAGE}:${TAG} ."
+                            sh "docker build -t ${DOCKERHUB_USER}/${DB_IMAGE}:${TAG} -t ${DOCKERHUB_USER}/${DB_IMAGE}:latest ."
                         }
                     }
                 }
             }
         }
 
-       stage('Push to Docker Hub') {
-    steps {
-        container('docker') {
-            withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                sh '''
-                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                    docker push sghazala/vprofileapp:${BUILD_NUMBER}
-                    docker push sghazala/vprofileapp:latest
-                '''
+        stage('Push to Docker Hub') {
+            steps {
+                container('docker') {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh """
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                            docker push ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG}
+                            docker push ${DOCKERHUB_USER}/${APP_IMAGE}:latest
+                            docker push ${DOCKERHUB_USER}/${DB_IMAGE}:${TAG}
+                            docker push ${DOCKERHUB_USER}/${DB_IMAGE}:latest
+                        """
+                    }
+                }
             }
         }
-    }
-}
 
         stage('Deploy to Kubernetes') {
             steps {
