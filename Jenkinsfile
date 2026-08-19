@@ -1,5 +1,5 @@
 pipeline {
-   agent {
+agent {
         kubernetes {
             yaml '''
 apiVersion: v1
@@ -14,27 +14,21 @@ spec:
     command:
     - cat
     tty: true
-    env:
-    - name: DOCKER_HOST
-      value: tcp://localhost:2375
-  - name: dind
-    image: docker:27-dind
-    securityContext:
-      privileged: true
-    env:
-    - name: DOCKER_TLS_CERTDIR
-      value: ""
-    - name: DOCKER_DRIVER
-      value: vfs
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
   - name: kubectl
     image: bitnami/kubectl:latest
     command:
     - cat
     tty: true
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
 '''
         }
     }
-
     environment {
         DOCKERHUB_USER = 'sghazala'
         APP_IMAGE = 'vprofileapp'
