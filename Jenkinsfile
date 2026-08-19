@@ -8,7 +8,7 @@ metadata:
   labels:
     jenkins: docker-build-agent
 spec:
-  nodeName: master01
+  nodeName: controlplane
   containers:
   - name: docker
     image: docker:27-cli
