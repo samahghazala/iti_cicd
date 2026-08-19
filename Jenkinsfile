@@ -69,20 +69,19 @@ spec:
             }
         }
 
-        stage('Push to Docker Hub') {
-            steps {
-                container('docker') {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                        sh '''
-                            echo "$PASS" | docker login -u "$USER" --password-stdin
-                            docker push ${DOCKERHUB_USER}/${APP_IMAGE}:${TAG}
-                            docker push ${DOCKERHUB_USER}/${DB_IMAGE}:${TAG}
-                            docker logout
-                        '''
-                    }
-                }
+       stage('Push to Docker Hub') {
+    steps {
+        container('docker') {
+            withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                sh '''
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker push sghazala/vprofileapp:${BUILD_NUMBER}
+                    docker push sghazala/vprofileapp:latest
+                '''
             }
         }
+    }
+}
 
         stage('Deploy to Kubernetes') {
             steps {
