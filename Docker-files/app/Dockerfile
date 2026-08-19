@@ -6,7 +6,7 @@ WORKDIR /vprofile-project
 
 RUN git checkout docker && \
     # Inject a visible banner at the top of the webpage body
-    ARG BUILD_NUMBER=1
+ARG BUILD_NUMBER=1
 RUN find src/main/webapp/ -name "*.jsp" -exec sed -i "s/<body>/<body><div style=\"background-color: #007bff; color: white; text-align: center; padding: 15px; font-size: 22px; font-weight: bold;\">🚀 BUILD #${BUILD_NUMBER} LIVE<\/div>/g" {} + && \
     mvn install
 
