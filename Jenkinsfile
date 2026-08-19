@@ -1,5 +1,5 @@
 pipeline {
-    agent {
+   agent {
         kubernetes {
             yaml '''
 apiVersion: v1
@@ -24,6 +24,8 @@ spec:
     env:
     - name: DOCKER_TLS_CERTDIR
       value: ""
+    - name: DOCKER_DRIVER
+      value: vfs
   - name: kubectl
     image: bitnami/kubectl:latest
     command:
