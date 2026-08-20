@@ -78,11 +78,10 @@ stages {
         }
     }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                container('kubectl') {
-                    withKubeConfig(serverUrl: 'https://cluster.local') {
-                        sh '''
+ stage('Deploy to Kubernetes') {
+         steps {
+            container('kubectl') {
+                    sh '''
                             kubectl apply -f app-secret.yml
                             kubectl apply -f db-CIP.yml
                             kubectl apply -f mc-CIP.yml
@@ -92,14 +91,11 @@ stages {
                             kubectl apply -f vproapp-service.yml
                             kubectl apply -f vproappdep.yml
                             kubectl apply -f vprodbdep.yml
-                            
                             kubectl rollout restart deployment/vproappdep || true
-                            kubectl rollout restart deployment/vprodbdep || true
                         '''
                     }
                 }
             }
-        }
     }
 
     post {
