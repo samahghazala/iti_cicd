@@ -18,9 +18,9 @@ spec:
     securityContext:
       runAsUser: 0
     volumeMounts:
-  - name: docker-sock
-      mountPath: /var/run/docker.sock
-  - name: kubectl
+     - name: docker-sock
+       mountPath: /var/run/docker.sock
+    - name: kubectl
     image: bitnami/kubectl:latest
     command:
     - cat
