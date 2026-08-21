@@ -19,7 +19,9 @@ spec:
       runAsUser: 0
     volumeMounts:
     - name: docker-sock
-      mountPath: /var/run/docker.sock
+      hostPath:
+      Path: /var/run/docker.sock
+      type: Socket
   - name: kubectl
     image: bitnami/kubectl:latest
     command:
