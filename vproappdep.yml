@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: vproapp
-        image: 3booda24/vprofileapp
+        image: sghazala/vprofileapp:latest  # or :${BUILD_NUMBER}
+        imagePullPolicy: Always
         ports:
         - name: vproapp-port
           containerPort: 8080
